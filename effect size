@@ -1,0 +1,46 @@
+library(pwr)
+
+QI <- data.frame(
+      groupA = rnorm(100, mean = 100, sd = 15),
+      groupB = rnorm(100, mean = 110, sd = 15)
+)
+
+summary(QI)
+
+pwr.t.test(d=(0-10)/15,power=.8,sig.level=.05,type="two.sample",alternative="two.sided")
+pwr.t.test(d=(0-10)/15,power=.6,sig.level=.05,type="two.sample",alternative="two.sided")
+pwr.t.test(d=(0-10)/15,power=.3,sig.level=.05,type="two.sample",alternative="two.sided")
+
+## amostra de 36 por grupo para poder elevado
+## amostra de 23 por grupo para poder moderado
+## amostra de 10 por grupo para poder fraco
+
+## Efeito na populacao total
+t.test(QI$groupA, QI$groupB)
+
+## Efeito fraco
+## função selecina 20 elementos aleatorios e calcula a diferença de efeito e o p
+efeito <- function(dt = QI, x = 20){
+  amostra <- dt[sample(nrow(dt), x, replace = TRUE), ]
+  diff <- mean(amostra$groupB - amostra$groupA)
+  test <- t.test(amostra$groupB, amostra$groupA)
+  cat("Diferença: ", diff, 'p value: ', test$p.value)
+}
+
+efeito <- function(dt = QI, x = 20){
+  amostra <- dt[sample(nrow(dt), x, replace = TRUE), ]
+  diff <- mean(amostra$groupB - amostra$groupA)
+  test <- t.test(amostra$groupB, amostra$groupA)
+  return(diff)
+}
+
+##Efeito fraco superestima as diferenças
+##Elas devem ser na média 10
+
+hist(replicate(1000, efeito(x = 20)))
+
+##Efeito Moderado
+hist(replicate(1000, efeito(x =50)))
+
+##Feito forte
+hist(replicate(1000, efeito(x = 80)))
