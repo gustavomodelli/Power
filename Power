@@ -1,0 +1,108 @@
+library(pwr)
+
+
+# Diet A and Diet B
+# redução da glicemia de 10mg/d
+# dp1 = 15 e dp2 = 17
+# n de tamanhos iguais
+
+pwr.t.test(d=(0-10)/16.03,power=.8,sig.level=.05,type="two.sample",alternative="two.sided")
+
+## Empareg Trial
+## -3.35 (-5.9, -0.81) 
+## sd calculado = 1.3
+## d de cohen = 0.257
+pwr.t.test(d=0.257,power=.8,sig.level=.05,type="two.sample",alternative="two.sided")
+
+pwr.t.test(d=0.257, n = 76 ,sig.level=.01,type="two.sample",alternative="two.sided")
+# Calculo do D de Cohen
+# Cohen's d = (M2 - M1) ??? SDpooled
+# SDpooled = ???((SD12 + SD22) ??? 2) 
+
+d_equal <- function(m1,m2,s1,s2){
+  sdpooled <- (s1 + s2) / 2
+  cohend <- abs((m1 - m2)) / sdpooled
+  print(cohend)
+}
+
+d_equal(10,20,5,6)
+
+pwr.t.test(d=0.3, power=.8, sig.level=.05, type = 'two.sample', alternative = 'two.sided')
+
+##Exemplo para duas amostras de tamanhos iguais
+mariana <- d_equal(87.4,84.75,20.4,15.7)
+poder <- pwr.t.test(n = 44, d= mariana, sig.level=.05, type="two.sample", alternative="two.sided")
+poder <- pwr.t.test(d= mariana, sig.level=.05, power = 0.8, type="two.sample", alternative="two.sided")
+
+plot(poder)
+
+##Calculo do estudo Pedro
+# Ganho de peso grupo controle 5kg sd = 10
+# Genho experimento 2Kg sd 10
+pedro <- d_equal(5,2.5,5,5)
+poder <- pwr.t.test(d= pedro, sig.level=.05, power = 0.8, type="two.sample", alternative="two.sided")
+
+# Calculo do Hedge's g
+# Usado no lugar do D de Cohen quando as amostras são diferentes
+
+d_diff <- function(m1,m2,s1,s2,n1,n2){
+  sdpooled <- (((n1 - 1)*s1) + ((n2 - 1)*s2)) / ((n1-1)+(n2-1))
+  hedgs <- abs((m1 - m2)) / sdpooled
+  print(hedgs)
+}
+
+d_diff(10,20,5,6,10,15)
+
+
+##Exemplo a ser calculado
+##Calculo para vitamina C
+# grupo01: n=56, m1=270, s1=123
+# grupo02: n=22  m2=258, s2=125
+
+vitaminab12 <- d_diff(270,258,123,125,56,22)
+poder <- pwr.t.test(n = (78/2), d= vitaminab12, sig.level=.05, type="two.sample", alternative="two.sided")
+plot(poder)
+
+##para duas amostras diferentes
+poder <- pwr.t2n.test(n1 = 56, n = 22, d= vitaminab12, sig.level=.05, alternative="two.sided")
+
+##Para a Vitamina C
+# grupo01: n=56, m1=16.3, s1= 3.1
+# grupo02: n=22, m2=15.8, s2= 1.7
+
+vitaminaC <- d_diff(16.3, 15.8, 3.1, 1.7, 56, 22)
+pwr.t.test(n = (78/2), d= vitaminaC, sig.level=.05, type="two.sample", alternative="two.sided")
+
+#Para acido folico
+# grupo 01: n=56, m1=19.7, s1=10.1
+# grupo 02: n=22, m2=19, s2=9.1
+
+
+acidofolico <- d_diff(19.7, 19, 10.1, 9.1, 56, 22)
+pwr.t.test(n = (78/2), d= acidofolico, sig.level=.05, type="two.sample", alternative="two.sided")
+
+
+##Calculo do n amostral para d=0.2 (efeito fraco)
+pwr.t.test(d = 0.2, sig.level = .05, power = 0.80, type = "two.sample",
+           alternative = "two.sided")
+
+#################### diferença entre duas proporções ####################
+#########################################################################
+
+##Diferença entre dois grupos
+## P1 = 50 e P2 = 55%
+## ES.h é o tamanho do efeito para duas proporções
+
+out <- pwr.2p.test(h = ES.h(p1 = 0.75, p2 = 0.50), 
+                    sig.level = 0.05, 
+                    power = 0.80, 
+                    alternative = "greater")
+
+plot(out)
+
+
+#### Estimativa do efeito ##############################################
+## Efeito fraco, moderado ou forte ###################################
+## test = r  p  t  chist  anov  f2
+## effect = small  medium  large
+cohen.ES(test = 'r', size = 'medium')
